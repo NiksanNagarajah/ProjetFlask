@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Info : {{ book.title }}</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
+    </head>
+    <body>
+        {% extends "base.html" %}
+        {% block main %}
+        <div class="book-container">
+            <div class="book-image">
+                <img src="{{ url_for('static', filename='images/'+book.img)}}" alt="{{book.title}}" title="{{book.title}}">
+            </div>
+            <div class="book-details">
+                <h1 class="book-title">{{ book.title }}</h1>
+                <p class="book-author">Auteur: <span>{{ book.author.name }}</span></p>
+                <p class="book-price">Prix: <span>{{ book.price }} €</span></p>
+                <div class="button-container">
+                    <a href="{{ book.url }}" target="_blank"><button class="buy-button">Acheter maintenant</button></a>
+                    {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('edit_author', id=book.author_id) }}"><button class="edit-button">Modifier l'auteur</button></a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endblock %}
+    </body>
+</html>
+
+
