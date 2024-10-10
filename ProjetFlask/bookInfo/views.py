@@ -162,16 +162,6 @@ class RegisterForm(FlaskForm):
     password = PasswordField('Password')
     submit = SubmitField('S\'inscrire')
 
-    # def validate(self):
-    #     if not FlaskForm.validate(self):
-    #         return False
-    #     user = User.query.get(self.username.data)
-    #     if user is not None:
-    #         self.username.errors.append("Ce nom d'utilisateur existe déjà.")
-    #         return False
-    #     return True
-
-
 @app.route("/sign-in/", methods=["GET", "POST"])
 def sign_in():
     f = RegisterForm()
@@ -195,4 +185,11 @@ def sign_in():
         db.session.commit()
         return redirect(url_for("login"))
     return render_template("sign_in.html", form=f, error=None)
+
+@app.route("/delete/author/<int:id>")
+def delete_author(id):
+    a = get_author(id)
+    db.session.delete(a)
+    db.session.commit()
+    return redirect(url_for('authors'))
 
