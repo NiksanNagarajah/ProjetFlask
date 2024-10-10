@@ -20,8 +20,8 @@ class Book(db.Model):
         return "<Book (%d) %s>" % (self.id, self.title)
 
 def get_sample():
-    return Book.query.all()
-    # return Book.query.limit(10).all()
+    # return Book.query.all()
+    return Book.query.limit(10).all()
 
 def get_author(id):
     return Author.query.get(id)
@@ -36,6 +36,17 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(80), primary_key=True)
     password = db.Column(db.String(80))
 
+    def __init__(self, username, password):
+        self.username = username
+        self.set_password(password)
+        print("********************", self.password, password)
+    
+    def set_password(self, password):
+        from hashlib import sha256
+        m = sha256()
+        m.update(password.encode())
+        self.password = m.hexdigest()
+
     def get_id(self):
         return self.username
 
@@ -46,6 +57,13 @@ from .app import login_manager
 def load_user(username):
     return User.query.get(username)
 
+def is_username_secure(username):
+    return len(username) >= 5 and ' ' not in username
 
+def is_password_secure(password):
+    return (len(password) >= 8 and
+            any(char.isdigit() for char in password) and
+            any(char.islower() for char in password) and
+            any(char.isupper() for char in password))
 
 
