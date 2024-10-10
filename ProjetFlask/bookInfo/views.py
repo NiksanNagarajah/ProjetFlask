@@ -22,7 +22,7 @@ def detail(id):
 from flask_wtf import FlaskForm
 from wtforms import StringField, HiddenField
 from wtforms.validators import DataRequired
-from flask import render_template
+from flask import render_template, flash
 
 class AuthorForm(FlaskForm):
     id = HiddenField('id')
@@ -111,7 +111,7 @@ def add_author():
 
     return render_template('add_author.html', form=form)
 
-from wtforms import PasswordField
+from wtforms import PasswordField, SubmitField
 from .models import User
 from hashlib import sha256
 
@@ -136,7 +136,6 @@ from flask_login import login_user
 @app.route("/login/", methods=["GET", "POST"])
 def login():
     f = LoginForm()
-    
     if not f.is_submitted():
         f.next.data = request.args.get("next")
     elif f.validate_on_submit():
@@ -145,7 +144,6 @@ def login():
             login_user(user)
             next_page = f.next.data or url_for("home")
             return redirect(next_page)
-    
     return render_template("login.html", form=f)
 
 
@@ -157,4 +155,41 @@ from flask import redirect, url_for
 def logout():
     logout_user()
     return redirect(url_for('home'))
+
+
+class RegisterForm(FlaskForm):
+    username = StringField('Username')
+    password = PasswordField('Password')
+    submit = SubmitField('S\'inscrire')
+
+@app.route("/sign-in/", methods=["GET", "POST"])
+def sign_in():
+    f = RegisterForm()
+    if f.validate_on_submit():
+        error = None
+        user = User.query.get(f.username.data)
+        if user is not None:
+            error = "Ce nom d'utilisateur existe déjà."
+            flash(error)
+            return render_template("sign_in.html", form=f, error=error)
+        if not is_username_secure(f.username.data):
+            error = "Le nom d'utilisateur doit contenir au moins 5 caractères et ne doit pas contenir d'espace."
+            flash(error)
+            return render_template("sign_in.html", form=f, error=error)
+        if not is_password_secure(f.password.data):
+            error = "Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule et un chiffre."
+            flash(error)
+            return render_template("sign_in.html", form=f, error=error)
+        user = User(f.username.data, f.password.data)
+        db.session.add(user)
+        db.session.commit()
+        return redirect(url_for("login"))
+    return render_template("sign_in.html", form=f, error=None)
+
+@app.route("/delete/author/<int:id>")
+def delete_author(id):
+    a = get_author(id)
+    db.session.delete(a)
+    db.session.commit()
+    return redirect(url_for('authors'))
 

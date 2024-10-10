@@ -9,7 +9,7 @@
         {% block main %}
         <div class="sample">
             {% for x in books %}
-            <a href="{{ url_for('detail', id=x.id) }}"><img src="{{ url_for('static', filename='images/' + x.img)}}" alt="{{x.title}}" title="{{x.title}}"></a> 
+            <a href="{{ url_for('detail', id=x.id) }}"><img src="{{ url_for('static', filename='images/' + x.img)}}" alt="{{x.title}}" title="{{x.title}}"></a>
             <!-- <img src="{{ url_for('static', filename='images/'+x.img)}}" alt="{{x.title}}" title="{{x.title}}"> -->
             {% endfor %}
         </div>

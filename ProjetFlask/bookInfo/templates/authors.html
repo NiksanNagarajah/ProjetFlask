@@ -24,10 +24,10 @@
                 <td>{{ x.name }}</td>
                 {% if current_user.is_authenticated %}
                     <td>
-                        <a href="{{ url_for('edit_author', id=x.id) }}">Éditer</a>
+                        <a class="action" href="{{ url_for('edit_author', id=x.id) }}">Éditer</a>
                     </td>
                     <td>
-                        <a href="#">Supprimer</a>
+                        <a class="action" href="#" onclick="confirmDelete('{{ url_for('delete_author', id=x.id) }}')">Supprimer</a>
                     </td>
                 {% endif %}
             </tr>
@@ -51,10 +51,10 @@
                 <td>{{ x.name }}</td>
                 {% if current_user.is_authenticated %}
                     <td>
-                        <a href="{{ url_for('edit_author', id=x.id) }}">Éditer</a>
+                        <a class="action" href="{{ url_for('edit_author', id=x.id) }}">Éditer</a>
                     </td>
                     <td>
-                        <a href="#">Supprimer</a>
+                        <a class="action" href="#" onclick="confirmDelete('{{ url_for('delete_author', id=x.id) }}')">Supprimer</a>
                     </td>
                 {% endif %}
             </tr>
@@ -62,4 +62,13 @@
         </table>
     </div>
 </div>
+
+<script>
+function confirmDelete(url) {
+    if (confirm("Êtes-vous sûr de vouloir supprimer cet auteur ?")) {
+        window.location.href = url;  // Redirige vers l'URL de suppression
+    }
+}
+</script>
+
 {% endblock %}
