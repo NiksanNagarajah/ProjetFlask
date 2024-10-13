@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>Favoris</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/favorites.css') }}">
+{% endblock %}
+
+{% block main %}
+<div class="favorites-container">
+    <h1>Mes Favoris</h1>
+    <div class="favorites-list">
+        {% for book in books %}
+        <a href="{{ url_for('detail', id=book.id) }}" class="book-link">
+            <div class="book-card">
+                <div class="book-image">
+                    <img src="{{ url_for('static', filename='images/'+book.img)}}" alt="{{book.title}}" title="{{book.title}}">
+                </div>
+                <div class="detail-book">
+                    <h2 class="book-title">{{ book.title }}</h2>
+                    <p class="book-author">Auteur: <span>{{ book.author.name }}</span></p>
+                    <p class="book-price">Prix: <span>{{ book.price }} €</span></p>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
