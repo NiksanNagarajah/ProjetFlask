@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
     <head>
-        {% block head %}
         <!-- Required meta tags -->
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -9,6 +8,7 @@
         <!-- Bootstrap CSS -->
         {{ bootstrap.load_css() }}
         {% endblock %}
+        {% block head %}
         <title>{{ title }}</title>
         {% endblock %}
         <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
@@ -32,11 +32,13 @@
                                 <a class="nav-link" href="https://github.com/NiksanNagarajah/Flask" target="_blank">Link</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link disabled">Disabled</a>
-                            </li>
-                            <li class="nav-item">
                                 <a class="nav-link" href="{{ url_for('authors') }}">Auteurs</a>
                             </li>
+                            {% if current_user.is_authenticated %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ url_for('favorites', username=current_user.username) }}">Favoris</a>
+                                </li>
+                            {% endif %}
                         </ul>
                         <form class="d-flex" role="search">
                             <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
@@ -70,7 +72,7 @@
                 {% endblock %}
             </div>
         </main>
-        <footer class="footer mt-auto py-3 bg-light">
+        <footer class="footer mt-auto py-3">
             <div class="container">
                 <span class="text-muted">© 2024 Niksan NAGARAJAH All rights reserved.</span>
             </div>
