@@ -3,6 +3,8 @@
     <head>
         <title>Info : {{ book.title }}</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
+        <!-- Lien vers Font Awesome pour les icônes de coeur -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     </head>
     <body>
         {% extends "base.html" %}
@@ -16,9 +18,26 @@
                 <p class="book-author">Auteur: <span>{{ book.author.name }}</span></p>
                 <p class="book-price">Prix: <span>{{ book.price }} €</span></p>
                 <div class="button-container">
-                    <a href="{{ book.url }}" target="_blank"><button class="buy-button">Acheter maintenant</button></a>
+                    <a href="{{ book.url }}" target="_blank">
+                        <button class="buy-button">Acheter maintenant</button>
+                    </a>
                     {% if current_user.is_authenticated %}
-                        <a href="{{ url_for('edit_author', id=book.author_id) }}"><button class="edit-button">Modifier l'auteur</button></a>
+                        <a href="{{ url_for('edit_author', id=book.author_id) }}">
+                            <button class="edit-button">Modifier l'auteur</button>
+                        </a>
+                        {% if book in current_user.favorite_books %}
+                            <a href="{{ url_for('remove_favorite', username=current_user.username, book_id=book.id) }}">
+                                <button class="favorite-button active">
+                                    <i class="fas fa-heart"></i> Retirer des favoris
+                                </button>
+                            </a>
+                        {% else %}
+                            <a href="{{ url_for('add_favorite', username=current_user.username, book_id=book.id) }}">
+                                <button class="favorite-button">
+                                    <i class="far fa-heart"></i> Ajouter aux favoris
+                                </button>
+                            </a>
+                        {% endif %}
                     {% endif %}
                 </div>
             </div>
@@ -26,5 +45,3 @@
         {% endblock %}
     </body>
 </html>
-
-

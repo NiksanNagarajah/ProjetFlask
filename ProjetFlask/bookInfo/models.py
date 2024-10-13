@@ -32,14 +32,21 @@ def get_authors():
 
 from flask_login import UserMixin
 
+# Table d'association pour les favoris
+user_favorites = db.Table('user_favorites',
+    db.Column('user_id', db.String(80), db.ForeignKey('user.username'), primary_key=True),
+    db.Column('book_id', db.Integer, db.ForeignKey('book.id'), primary_key=True)
+)
+
 class User(db.Model, UserMixin):
     username = db.Column(db.String(80), primary_key=True)
     password = db.Column(db.String(80))
 
+    favorite_books = db.relationship('Book', secondary=user_favorites, lazy='dynamic', backref=db.backref('favorited_by', lazy='dynamic'))
+
     def __init__(self, username, password):
         self.username = username
         self.set_password(password)
-        print("********************", self.password, password)
     
     def set_password(self, password):
         from hashlib import sha256
@@ -49,6 +56,19 @@ class User(db.Model, UserMixin):
 
     def get_id(self):
         return self.username
+    
+    def add_to_favorites(self, book):
+        if not self.is_favorite(book):
+            self.favorite_books.append(book)
+            db.session.commit()
+
+    def remove_from_favorites(self, book):
+        if self.is_favorite(book):
+            self.favorite_books.remove(book)
+            db.session.commit()
+
+    def is_favorite(self, book):
+        return self.favorite_books.filter_by(id=book.id).count() > 0
 
 
 from .app import login_manager

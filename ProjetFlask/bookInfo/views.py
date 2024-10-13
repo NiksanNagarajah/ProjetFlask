@@ -193,3 +193,28 @@ def delete_author(id):
     db.session.commit()
     return redirect(url_for('authors'))
 
+@app.route("/favorites/<string:username>")
+def favorites(username):
+    user = User.query.get(username)
+    books = user.favorite_books.all()
+    return render_template(
+        "favorites.html",
+        user=user,
+        books=books
+    )
+
+@app.route("/add_favorite/<string:username>/<int:book_id>")
+def add_favorite(username, book_id):
+    user = User.query.get(username)
+    book = Book.query.get(book_id)
+    user.add_to_favorites(book)
+    return redirect(url_for('detail', id=book_id))
+
+@app.route("/remove_favorite/<string:username>/<int:book_id>")
+def remove_favorite(username, book_id):
+    user = User.query.get(username)
+    book = Book.query.get(book_id)
+    user.remove_from_favorites(book)
+    return redirect(url_for('detail', id=book_id))
+
+
