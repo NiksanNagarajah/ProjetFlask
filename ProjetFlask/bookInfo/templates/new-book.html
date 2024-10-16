@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block main %}
+<h1>Ajouter un Livre</h1>
+<form role="form" method="POST" action="{{ url_for ('save_new_book') }}">
+    {{ form.hidden_tag() }}
+    <div class=
+        {% if form.price.errors %}
+        "form-group has-error"
+        {% else %} 
+        "form-group"
+        {% endif %}
+        >
+        {{ form.price.label }} {{ form.price(size =50, class_="form-control") }}
+    </div>
+
+    <div class=
+        {% if form.title.errors %}
+        "form-group has-error"
+        {% else %} 
+        "form-group"
+        {% endif %}
+        >
+        {{ form.title.label }} {{ form.title(size =50, class_="form-control") }}
+    </div>
+
+
+
+    {% if form.title.errors %}
+    <ul class="list-group">
+        {% for e in form.title.errors %}
+        <li class="list-group-item list-group-item-danger">{{ e }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    {% if form.price.errors %}
+    <ul class="list-group">
+        {% for e in form.price.errors %}
+        <li class="list-group-item list-group-item-danger">{{ e }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+
+    <input class="btn btn-default" type="submit" value="Enregistrer">
+</form>
+{% endblock %}

@@ -28,6 +28,13 @@ class AuthorForm(FlaskForm):
     id = HiddenField('id')
     name = StringField('Nom', validators=[DataRequired()])
 
+class BookForm(FlaskForm):
+    id = HiddenField('id')
+    title = StringField('Titre', validators=[DataRequired()])
+    price = StringField('Prix', validators=[DataRequired()])
+
+
+
 from flask_login import login_required
 
 @app.route("/edit/author/<int:id>")
@@ -38,6 +45,17 @@ def edit_author(id):
     return render_template(
     "edit-author.html",
     author=a, form=f)
+
+
+@app.route("/edit/book/<int:id>")
+@login_required
+def edit_book(id):
+    b = get_book(id)
+    f = BookForm(id = b.id, title = b.title, price = b.price)
+    return render_template(
+    "edit-book.html",
+    book=b, form=f)
+    
 
 from flask import url_for, redirect, render_template
 from .app import db
@@ -60,6 +78,22 @@ def save_author():
         form=f
     )
 
+@app.route("/save/book/<int:idBook>", methods=("POST",))
+def save_book(idBook):
+    f = BookForm()
+    if f.validate_on_submit():
+        id = int(f.id.data)
+        b = get_book(id)
+        b.title = f.title.data
+        db.session.commit()
+        return redirect(url_for('edit_book', id = b.id))
+    b = get_book(int(f.id.data))
+    return render_template(
+        "edit-book.html",
+        book=b,
+        form=f
+    )
+
 @app.route("/save/newAuthor", methods=("POST",))
 def save_new_author():
     f = AuthorForm()
@@ -78,6 +112,25 @@ def authors():
         "authors.html",
         authors=get_authors()
         )
+
+@app.route("/save/newBook", methods=('POST',))
+def save_new_book():
+    f = BookForm()
+    if f.validate_on_submit():
+        b = Book(title=f.title.data, price=f.price.data)
+        db.session.add(b)
+        db.session.commit()
+        return redirect(url_for('books'))
+    return render_template(
+    "new-book.html",
+    form=f)
+
+@app.route("/books")
+def books():
+    return render_template(
+        "books.html",
+        books=get_sample()
+    )
 
 @app.route("/author/newAuthor")
 @login_required
@@ -98,6 +151,35 @@ def newAuthor():
         form=form
         )
 
+@app.route("/book/newBook")
+@login_required
+def newBook():
+    id = Book.query.count() +1
+    form = BookForm(id=id)
+    if form.validate_on_submit():
+        if form.title.data =="":
+            flash("Le titre est obligatoire")
+            return redirect(url_for('newBook'))
+        elif form.price.data =="":
+            flash("Le prix est obligatoire")
+            return redirect(url_for('newBook'))
+        elif form.url.data =="":
+            flash("L'url est obligatoire")
+            return redirect(url_for('newBook'))
+        elif form.img.data =="":
+            flash("L'image est obligatoire")
+            return redirect(url_for('newBook'))
+        new_book = Book(id=id, title=form.title.data, price=form.price.data, url=form.url.data, img=form.img.data)
+        db.session.add(new_book)
+        db.session.commit()
+        flash("Livre ajouté avec succès !")
+        return redirect(url_for('books'))
+    return render_template(
+        "new-book.html",
+        form=form
+    )
+
+
 
 @app.route('/add_author', methods=['GET', 'POST'])
 def add_author():
@@ -110,6 +192,18 @@ def add_author():
         return redirect(url_for('authors'))  # Rediriger vers la liste des auteurs
 
     return render_template('add_author.html', form=form)
+
+@app.route("/add_book", methods=['GET', 'POST'])
+def add_book():
+    form = BookForm()
+    if form.validate_on_submit():
+        new_book = Book(title=form.title.data, price=form.price.data, url=form.url.data, img=form.img.data)
+        db.session.add(new_book)
+        db.session.commit()
+        flash('Livre enregistré avec succès !')
+        return redirect(url_for('books'))  # Rediriger vers la liste des auteurs
+
+    return render_template('add_book.html', form=form)
 
 from wtforms import PasswordField, SubmitField
 from .models import User
@@ -128,6 +222,8 @@ class LoginForm(FlaskForm):
         m.update(self.password.data.encode())
         passwd = m.hexdigest()
         return user if passwd == user.password else None
+    
+
 
 
 from flask import request, redirect, render_template, url_for
@@ -192,6 +288,13 @@ def delete_author(id):
     db.session.delete(a)
     db.session.commit()
     return redirect(url_for('authors'))
+
+@app.route("/delete/book/<int:id>")
+def delete_book(id):
+    b = get_book(id)
+    db.session.delete(b)
+    db.session.commit()
+    return redirect(url_for('books'))
 
 @app.route("/favorites/<string:username>")
 def favorites(username):
