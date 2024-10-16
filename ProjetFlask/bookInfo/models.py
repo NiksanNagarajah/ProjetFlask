@@ -29,6 +29,9 @@ def get_author(id):
 def get_authors():
     return Author.query.all()
 
+def get_book(id):
+    return Book.query.get(id)
+
 
 from flask_login import UserMixin
 
