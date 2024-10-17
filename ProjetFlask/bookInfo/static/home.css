@@ -352,3 +352,37 @@ h1 {
 }
 
 
+#search-input {
+    position: relative;
+    z-index: 10; /* S'assure que l'input est bien au-dessus des autres éléments */
+}
+
+#search-suggestions {
+    display: block;
+    position: absolute;
+    top: 100%;  /* Positionne le datalist juste en dessous du champ */
+    left: 0;
+    z-index: 999;
+    width: 100%;
+    max-width: 400px;  /* Largeur maximale si vous voulez qu'il ne dépasse pas une certaine taille */
+    box-sizing: border-box;
+    background-color: white;
+    border: 1px solid #ccc;
+    max-height: 200px;  /* Limite la hauteur des suggestions */
+    overflow-y: auto;
+}
+
+.suggestion-item {
+    padding: 10px;
+    cursor: pointer;
+    width: 100%;  /* Assure que le datalist prend la même largeur que l'input */
+    max-width: 400px;
+}
+
+.suggestion-item:hover {
+    background-color: #f0f0f0;
+}
+
+
+
+
