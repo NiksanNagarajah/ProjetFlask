@@ -384,5 +384,81 @@ h1 {
 }
 
 
+/* Container for the author card */
+.author-card {
+    padding: 20px;
+    background-color: #fdfdfd;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Hover effect for the author card */
+.author-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Author's name style */
+.author-name {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+/* Number of books text */
+.author-books-count {
+    font-size: 18px;
+    color: #555;
+    margin-bottom: 15px;
+}
+
+/* List of books by the author */
+.author-books-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Individual book links under the author */
+.author-books-list a {
+    font-size: 16px;
+    color: #3498db;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+/* Hover effect for book links */
+.author-books-list a:hover {
+    color: #2980b9;
+    text-decoration: underline;
+}
+
+/* Responsive design for the favorites list */
+@media (min-width: 768px) {
+    .favorites-list {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+}
+
+/* Specific styling for books when displayed alongside authors */
+.book-link {
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.book-link:hover .book-card {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
 
 
