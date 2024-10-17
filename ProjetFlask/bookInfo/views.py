@@ -321,26 +321,48 @@ def remove_favorite(username, book_id):
 
 @app.route("/suggestions", methods=["GET"])
 def suggestions():
-    query = request.args.get('query', '').lower()
-    results = []
+    # query = request.args.get('query', '').lower()
+    # results = []
     
-    if query:
-        books = Book.query.filter(Book.title.ilike(f"%{query}%")).all()
-        results = []
-        for book in books:
-            results.append({
+    # if query:
+    #     books = Book.query.filter(Book.title.ilike(f"%{query}%")).all()
+    #     results = []
+    #     for book in books:
+    #         results.append({
+    #             'id': book.id,
+    #             'title': book.title,
+    #             'price': book.price,
+    #             'img': url_for('static', filename='images/'+book.img),  
+    #             'url_detail': url_for('detail', id=book.id)
+    #         })
+    # return jsonify({'suggestions': results})
+    query = request.args.get('query', '').lower()
+    books = Book.query.filter(Book.title.ilike(f"%{query}%")).all()
+    les_livres = []
+    for book in books:
+            les_livres.append({
                 'id': book.id,
                 'title': book.title,
                 'price': book.price,
                 'img': url_for('static', filename='images/'+book.img),  
                 'url_detail': url_for('detail', id=book.id)
-            })
-    return jsonify({'suggestions': results})
+            }) 
+    authors = Author.query.filter(Author.name.ilike(f"%{query}%")).all()
+    les_auteurs = []
+    for author in authors:
+        les_auteurs.append({
+            'id': author.id,
+            'name': author.name,
+            'url_author': url_for('search_author', query=author.name)
+        })
+    print("'''''''''''''''''''''''''''''''")
+    return jsonify({'books': les_livres, 'authors': les_auteurs})
+
 
 @app.route("/search", methods=["GET"])
 def search():
     query = request.args.get('query', '')
-    filter_type = request.args.get('filter', 'books')  # Filtre (Livres, Auteurs, Tous)
+    filter_type = request.args.get('filter', 'all')  # Filtre (Livres, Auteurs, Tous)
     if not query:
         results = []
     else:
@@ -352,11 +374,22 @@ def search():
             books = Book.query.filter(Book.title.ilike(f"%{query}%")).all()
             authors = Author.query.filter(Author.name.ilike(f"%{query}%")).all()
             results = books + authors  # Combine livres et auteurs
-
+    print("----------------------")
     return render_template(
         'search_results.html',
         query=query,
         results=results,
         filter_type=filter_type
+    )
+
+@app.route("/search_author", methods=["GET"])  # Renommez cette route pour qu'elle soit unique
+def search_author():
+    query = request.args.get('query', '')
+    authors = Author.query.filter(Author.name.ilike(f"%{query}%")).all()  # Récupérez les auteurs basés sur le nom
+    return render_template(
+        'search_results.html', 
+        query=query, 
+        results=authors, 
+        filter_type='authors'
     )
 

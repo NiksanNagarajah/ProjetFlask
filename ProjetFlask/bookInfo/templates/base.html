@@ -96,7 +96,6 @@
 </html>
 
 
-
 <script>
     function searchSuggestions() {
         let query = document.getElementById('search-input').value;
@@ -108,9 +107,14 @@
             fetch(`/suggestions?query=${query}`)
                 .then(response => response.json())
                 .then(data => {
-                    if (data.suggestions.length > 0) {
+                    // Vérifie s'il y a des livres ou des auteurs
+                    let suggestionsFound = false;
+
+                    if (data.books.length > 0 || data.authors.length > 0) {
                         suggestionList.style.display = 'block';  // Affiche la liste si des résultats sont trouvés
-                        data.suggestions.forEach(function(suggestion) {
+
+                        // Affiche les suggestions de livres
+                        data.books.forEach(function(suggestion) {
                             let listItem = document.createElement('li');
                             listItem.classList.add('suggestion-item');
                             listItem.style.padding = '10px';
@@ -119,7 +123,7 @@
 
                             // Crée un lien qui redirige vers la page du livre
                             let bookLink = document.createElement('a');
-                            bookLink.href = `${suggestion.url_detail}`;
+                            bookLink.href = `${suggestion.url_detail}`;  // Modifiez l'URL si nécessaire
                             bookLink.style.textDecoration = 'none';  
                             bookLink.style.color = 'black';  
 
@@ -129,14 +133,47 @@
                                 <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
                                     <img src="${suggestion.img}" alt="${suggestion.title}" style="width: 50px; height: 75px; margin-right: 10px;">
                                     <strong style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${truncatedTitle}</strong>
-                                    <span style="white-space: nowrap; margin-left: auto;">$${suggestion.price}</span>
+                                    <span style="white-space: nowrap; margin-left: auto;">${suggestion.price} €</span>
                                 </div>
                             `;
                             bookLink.innerHTML = content;
                             listItem.appendChild(bookLink);
                             suggestionList.appendChild(listItem);
+                            suggestionsFound = true; // Indique qu'il y a des suggestions
                         });
-                    } else {
+                    }
+
+                    // Affiche les suggestions d'auteurs
+                    if (data.authors.length > 0) {
+                        data.authors.forEach(function(suggestion) {
+                            let listItem = document.createElement('li');
+                            listItem.classList.add('suggestion-item');
+                            listItem.style.padding = '10px';
+                            listItem.style.borderBottom = '1px solid #ddd';
+                            listItem.style.cursor = 'pointer';
+
+                            // Crée un lien qui redirige vers la page de l'auteur
+                            let authorLink = document.createElement('a');
+                            authorLink.href = `${suggestion.url_author}`;  // Modifiez l'URL si nécessaire
+                            authorLink.style.textDecoration = 'none';  
+                            authorLink.style.color = 'black';  
+
+                            let truncatedName = suggestion.name.length > 30 ? suggestion.name.substring(0, 30) + '...' : suggestion.name;
+
+                            let content = `
+                                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                                    <strong style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${truncatedName}</strong>
+                                </div>
+                            `;
+                            authorLink.innerHTML = content;
+                            listItem.appendChild(authorLink);
+                            suggestionList.appendChild(listItem);
+                            suggestionsFound = true; // Indique qu'il y a des suggestions
+                        });
+                    }
+
+                    // Si aucune suggestion n'est trouvée
+                    if (!suggestionsFound) {
                         suggestionList.style.display = 'none';  
                     }
                 })
@@ -145,9 +182,9 @@
                 });
         }
     }
+
+    document.getElementById('search-input').addEventListener('input', searchSuggestions);
 </script>
-
-
 
 
 
