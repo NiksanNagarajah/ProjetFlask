@@ -332,21 +332,31 @@ def suggestions():
                 'id': book.id,
                 'title': book.title,
                 'price': book.price,
-                'img': book.img,  
+                'img': url_for('static', filename='images/'+book.img),  
                 'url_detail': url_for('detail', id=book.id)
             })
     return jsonify({'suggestions': results})
 
 @app.route("/search", methods=["GET"])
 def search():
-    query = request.args.get('query')
-    if query:
-        results = [book for book in get_all_books() if query.lower() in book.title.lower()]
-    else:
+    query = request.args.get('query', '')
+    filter_type = request.args.get('filter', 'books')  # Filtre (Livres, Auteurs, Tous)
+    if not query:
         results = []
+    else:
+        if filter_type == 'books':
+            results = Book.query.filter(Book.title.ilike(f"%{query}%")).all()
+        elif filter_type == 'authors':
+            results = Author.query.filter(Author.name.ilike(f"%{query}%")).all()
+        else:
+            books = Book.query.filter(Book.title.ilike(f"%{query}%")).all()
+            authors = Author.query.filter(Author.name.ilike(f"%{query}%")).all()
+            results = books + authors  # Combine livres et auteurs
+
     return render_template(
         'search_results.html',
         query=query,
-        results=results
+        results=results,
+        filter_type=filter_type
     )
 

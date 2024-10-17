@@ -43,8 +43,16 @@
                         <form class="d-flex" role="search" method="GET" action="{{ url_for('search') }}">
                             <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="query" id="search-input" autocomplete="off" list="search-suggestions" onkeyup="searchSuggestions()">
                             <datalist id="search-suggestions"></datalist>
+                        
+                            <!-- Menu déroulant pour le filtre -->
+                            <select class="form-select me-2" name="filter" id="search-filter">
+                                <option value="all">Tous</option> <!-- Rechercher à la fois Livres et Auteurs -->
+                                <option value="books">Livres</option>
+                                <option value="authors">Auteurs</option>
+                            </select>
+                        
                             <button class="btn btn-outline-success" type="submit">Search</button>
-                        </form>                        
+                        </form>                    
                         <ul class="nav navbar-nav navbar-right">
                             {% if current_user.is_authenticated %}
                                 <li>
@@ -86,58 +94,61 @@
         {% block main %}{% endblock %}
     </body>
 </html>
+
+
+
 <script>
-function searchSuggestions() {
-    let query = document.getElementById('search-input').value;
-    let suggestionList = document.getElementById('search-suggestions');
+    function searchSuggestions() {
+        let query = document.getElementById('search-input').value;
+        let suggestionList = document.getElementById('search-suggestions');
+        suggestionList.innerHTML = '';
+        suggestionList.style.display = 'none';  // Cache la liste par défaut
 
-    // Réinitialise la liste des suggestions
-    suggestionList.innerHTML = '';
-    suggestionList.style.display = 'none';  // Cache la liste par défaut
+        if (query.length > 0) {
+            fetch(`/suggestions?query=${query}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.suggestions.length > 0) {
+                        suggestionList.style.display = 'block';  // Affiche la liste si des résultats sont trouvés
+                        data.suggestions.forEach(function(suggestion) {
+                            let listItem = document.createElement('li');
+                            listItem.classList.add('suggestion-item');
+                            listItem.style.padding = '10px';
+                            listItem.style.borderBottom = '1px solid #ddd';
+                            listItem.style.cursor = 'pointer';
 
-    if (query.length > 2) {  // Commencer à suggérer après 3 caractères
-        fetch(`/suggestions?query=${query}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.suggestions.length > 0) {
-                    suggestionList.style.display = 'block';  // Affiche la liste si des résultats sont trouvés
+                            // Crée un lien qui redirige vers la page du livre
+                            let bookLink = document.createElement('a');
+                            bookLink.href = `${suggestion.url_detail}`;
+                            bookLink.style.textDecoration = 'none';  
+                            bookLink.style.color = 'black';  
 
-                    // Ajoute chaque suggestion dans la liste
-                    data.suggestions.forEach(function(suggestion) {
-                        let listItem = document.createElement('li');
-                        listItem.classList.add('suggestion-item');
-                        listItem.style.padding = '10px';
-                        listItem.style.borderBottom = '1px solid #ddd';
-                        listItem.style.cursor = 'pointer';
+                            let truncatedTitle = suggestion.title.length > 30 ? suggestion.title.substring(0, 30) + '...' : suggestion.title;
 
-                        // Crée un lien qui redirige vers la page du livre
-                        let bookLink = document.createElement('a');
-                        bookLink.href = `${suggestion.url_detail}`;  
-                        bookLink.style.textDecoration = 'none';  // Enlever le soulignement du lien
-                        bookLink.style.color = 'black';  // Modifier la couleur du lien si nécessaire
-
-                        // Ajoute l'image du livre, le titre et le prix
-                        let content = `
-                            <img src="${suggestion.img}" alt="${suggestion.title}" style="width: 50px; height: 75px; margin-right: 10px;">
-                            <strong>${suggestion.title}</strong>
-                            <span style="float: right;">$${suggestion.price}</span>
-                        `;
-                        bookLink.innerHTML = content;
-
-                        // Ajoute l'événement de clic au lien (pas besoin de l'ajouter directement sur le listItem)
-                        listItem.appendChild(bookLink);
-
-                        suggestionList.appendChild(listItem);
-                    });
-                } else {
-                    suggestionList.style.display = 'none';  // Cache la liste si aucun résultat
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching suggestions:', error);
-            });
+                            let content = `
+                                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                                    <img src="${suggestion.img}" alt="${suggestion.title}" style="width: 50px; height: 75px; margin-right: 10px;">
+                                    <strong style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${truncatedTitle}</strong>
+                                    <span style="white-space: nowrap; margin-left: auto;">$${suggestion.price}</span>
+                                </div>
+                            `;
+                            bookLink.innerHTML = content;
+                            listItem.appendChild(bookLink);
+                            suggestionList.appendChild(listItem);
+                        });
+                    } else {
+                        suggestionList.style.display = 'none';  
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching suggestions:', error);
+                });
+        }
     }
-}
-
 </script>
+
+
+
+
+
 
