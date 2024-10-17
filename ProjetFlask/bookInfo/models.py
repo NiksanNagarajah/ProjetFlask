@@ -17,11 +17,14 @@ class Book(db.Model):
     author = db.relationship("Author", backref=db.backref("books", lazy="dynamic"))
 
     def __repr__(self):
-        return "<Book (%d) %s>" % (self.id, self.title)
+        return "<Book (%d) %s>" % (self.id, self.title) + self.author.name + self.url + self.img
 
 def get_sample():
     # return Book.query.all()
     return Book.query.limit(10).all()
+
+def get_all_books():
+    return Book.query.all()
 
 def get_author(id):
     return Author.query.get(id)

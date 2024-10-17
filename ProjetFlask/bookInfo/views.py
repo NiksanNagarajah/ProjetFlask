@@ -1,19 +1,18 @@
 from .app import app
-from flask import render_template
+from flask import render_template, jsonify
 from .models import *
 
 @app.route('/')
 def home():
     return render_template(
         'home.html', 
-        title="My Books !",
+        title="Accueil",
         books=get_sample())
 
 @app.route("/detail/<id>")
 def detail(id):
-    books = get_sample()
-    book = get_sample()[int(id)-1]
-    print(book)
+    # books = get_sample()
+    book = get_all_books()[int(id)-1]
     return render_template(
         'detail.html',
         book=book,
@@ -320,4 +319,34 @@ def remove_favorite(username, book_id):
     user.remove_from_favorites(book)
     return redirect(url_for('detail', id=book_id))
 
+@app.route("/suggestions", methods=["GET"])
+def suggestions():
+    query = request.args.get('query', '').lower()
+    results = []
+    
+    if query:
+        books = Book.query.filter(Book.title.ilike(f"%{query}%")).all()
+        results = []
+        for book in books:
+            results.append({
+                'id': book.id,
+                'title': book.title,
+                'price': book.price,
+                'img': book.img,  
+                'url_detail': url_for('detail', id=book.id)
+            })
+    return jsonify({'suggestions': results})
+
+@app.route("/search", methods=["GET"])
+def search():
+    query = request.args.get('query')
+    if query:
+        results = [book for book in get_all_books() if query.lower() in book.title.lower()]
+    else:
+        results = []
+    return render_template(
+        'search_results.html',
+        query=query,
+        results=results
+    )
 

@@ -1,4 +1,7 @@
 {% extends "base.html" %}
+{% block head %}
+<title>Modifier : {{ author.name }}</title>
+{% endblock %}
 {% block main %}
 <h1>Edit author: {{ author.name }}</h1>
 <form class="form-horizontal" role="form" method="POST" action="{{ url_for('save_author', idBook=idBook) }}">
