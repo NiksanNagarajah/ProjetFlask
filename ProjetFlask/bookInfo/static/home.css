@@ -13,12 +13,21 @@ a {
     text-decoration: none;
 }
 
+img {
+    border-radius: 8px;
+}
+
 .sample>a {
     margin: 10px;
 }
 
 .sample img {
     height: 150px;
+    transition: transform 0.3s ease;
+}
+
+.sample img:hover {
+    transform: scale(1.1);
 }
 
 footer {
@@ -189,6 +198,30 @@ th, td {
 
 th {
     background-color: #f2f2f2;
+}
+
+th a {
+    text-decoration: none;
+    color: inherit;
+}
+
+th a:hover {
+    text-decoration: underline;
+}
+
+th i {
+    margin-left: 5px;
+}
+
+table img {
+    width: 50px;
+    height: auto;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+table img:hover {
+    transform: scale(2);
 }
 
 .action {
@@ -448,11 +481,11 @@ h1 {
     }
 }
 
-@media (max-width: 1000px) {
+/* @media (max-width: 1000px) {
     .disapear {
         display: none;
     }
-}
+} */
 
 .book-link {
     text-decoration: none;

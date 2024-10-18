@@ -137,10 +137,22 @@ def save_new_author():
 
 @app.route("/authors")
 def authors():
+    sort = request.args.get("sort", "id")  # Récupérer le paramètre de tri depuis l'URL
+    if sort == "id":
+        les_auteurs_avec_nb_livres = db.session.query(Author, db.func.count(Book.id)).outerjoin(Book).group_by(Author.id).order_by(Author.id).all()
+    elif sort == "name":
+        les_auteurs_avec_nb_livres = db.session.query(Author, db.func.count(Book.id)).outerjoin(Book).group_by(Author.id).order_by(Author.name).all()
+    elif sort == "nbLivre":
+        les_auteurs_avec_nb_livres = db.session.query(Author, db.func.count(Book.id)).outerjoin(Book).group_by(Author.id).order_by(db.func.count(Book.id)).all()
+    else:
+        les_auteurs_avec_nb_livres = db.session.query(Author, db.func.count(Book.id)).outerjoin(Book).group_by(Author.id).order_by(Author.id).all()
+
     return render_template(
         "authors.html",
-        authors=get_authors()
-        )
+        authors=les_auteurs_avec_nb_livres,
+        sort=sort
+    )
+
 
 @app.route("/save/newBook", methods=('POST',))
 def save_new_book():
@@ -156,9 +168,18 @@ def save_new_book():
 
 @app.route("/books")
 def books():
+    sort = request.args.get("sort", "id")
+    if sort == "id":
+        books = Book.query.order_by(Book.id).all()
+    elif sort == "titre":
+        books = Book.query.order_by(Book.title).all()
+    elif sort == "prix":
+        books = Book.query.order_by(Book.price).all()
+    else:
+        books = Book.query.order_by(Book.id).all()
     return render_template(
         "books.html",
-        books=get_sample()
+        books=books
     )
 
 @app.route("/author/newAuthor")
@@ -313,6 +334,7 @@ def sign_in():
 
 @app.route("/delete/author/<int:id>")
 def delete_author(id):
+    print("delete author")
     a = get_author(id)
     db.session.delete(a)
     db.session.commit()
