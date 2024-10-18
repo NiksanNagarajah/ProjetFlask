@@ -46,7 +46,7 @@ main > .container {
     overflow: hidden;
     width: 600px;
     margin: auto;
-    margin-top: 10%;
+    margin-top: 50px;
 }
 
 .book-image img {
@@ -448,7 +448,12 @@ h1 {
     }
 }
 
-/* Specific styling for books when displayed alongside authors */
+@media (max-width: 1000px) {
+    .disapear {
+        display: none;
+    }
+}
+
 .book-link {
     text-decoration: none;
     color: inherit;
@@ -460,5 +465,89 @@ h1 {
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
+/* Section des avis */
+.book-reviews {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin: 20px auto;
+    max-width: 600px;
+    margin-bottom: 75px;
+    margin-top: 30px;
+}
+
+.book-reviews h2 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.book-reviews ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.book-reviews ul li {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+.book-reviews ul li strong {
+    color: #3498db;
+}
+
+.book-reviews p {
+    font-size: 16px;
+    color: #555;
+    text-align: center;
+    padding: 10px;
+    background-color: #f4f4f4;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.book-reviews form {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.book-reviews textarea {
+    resize: none;
+    height: 100px;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.book-reviews button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.book-reviews button:hover {
+    background-color: #2980b9;
+}
+
+.book-reviews p.connect-message {
+    font-size: 16px;
+    color: #e74c3c;
+    text-align: center;
+    margin-top: 10px;
+}
 
 

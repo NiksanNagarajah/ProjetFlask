@@ -7,6 +7,15 @@ class Author(db.Model):
     def __repr__(self):
         return "<Author (%d) %s>" % (self.id, self.name)
 
+# Table d'association pour les favoris
+book_avis = db.Table('book_avis',
+    db.Column('id', db.Integer, primary_key=True), 
+    db.Column('book_id', db.Integer, db.ForeignKey('book.id'), nullable=False),
+    db.Column('user_id', db.String(80), db.ForeignKey('user.username'), nullable=False),
+    db.Column('avis', db.String(255), nullable=False)
+)
+
+
 class Book(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     price = db.Column(db.Float)
@@ -15,6 +24,20 @@ class Book(db.Model):
     img = db.Column(db.String(100))
     author_id = db.Column(db.Integer, db.ForeignKey("author.id"))
     author = db.relationship("Author", backref=db.backref("books", lazy="dynamic"))
+
+    avis_livre = db.relationship('User', secondary=book_avis, lazy='dynamic', backref=db.backref('avis_de', lazy='dynamic'))
+
+
+    def add_avis(self, user, avis_text):
+        """Ajoute un avis pour un livre donné par un utilisateur sans mise à jour."""
+        new_avis = book_avis.insert().values(book_id=self.id, user_id=user.username, avis=avis_text)
+        db.session.execute(new_avis)
+        db.session.commit()
+
+
+    def get_avis(self):
+        return db.session.query(book_avis).filter_by(book_id=self.id).all()
+
 
     def __repr__(self):
         return "<Book (%d) %s>" % (self.id, self.title) + self.author.name + self.url + self.img

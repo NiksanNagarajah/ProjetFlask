@@ -55,8 +55,8 @@
                         </form>                    
                         <ul class="nav navbar-nav navbar-right">
                             {% if current_user.is_authenticated %}
-                                <li>
-                                    <a>{{ current_user.username }}</a>
+                                <li class="disapear">
+                                    <a class="disapear">{{ current_user.username }}</a>
                                 <li>
                                     <a href="{{ url_for('logout') }}">
                                         <span class="glyphicon glyphicon-log-out" title="Logout"></span> Logout

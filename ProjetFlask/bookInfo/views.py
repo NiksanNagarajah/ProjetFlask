@@ -1,6 +1,9 @@
 from .app import app
 from flask import render_template, jsonify
 from .models import *
+from flask import request, redirect, url_for, render_template
+from flask_login import current_user, login_required
+
 
 @app.route('/')
 def home():
@@ -10,12 +13,40 @@ def home():
 
 @app.route("/detail/<id>")
 def detail(id):
-    # books = get_sample()
-    book = get_all_books()[int(id)-1]
+    book = get_book(id)
+    avis = book.get_avis()
+    
     return render_template(
         'detail.html',
         book=book,
+        avis=avis  # Passe les avis au template
     )
+
+
+from flask import request, redirect, url_for, render_template
+from flask_login import current_user
+
+@app.route("/add_avis/<int:book_id>", methods=["POST"])
+@login_required
+def add_avis(book_id):
+    book = get_book(book_id)
+    avis_text = request.form.get("avis")
+    
+    if avis_text:
+        book.add_avis(current_user, avis_text)
+        flash("Votre avis a été ajouté ou mis à jour avec succès.")
+    else:
+        flash("L'avis ne peut pas être vide.")
+    
+    return redirect(url_for('detail', id=book_id))
+
+
+# @app.route("/add_favorite/<string:username>/<int:book_id>")
+# def add_favorite(username, book_id):
+#     user = User.query.get(username)
+#     book = Book.query.get(book_id)
+#     user.add_to_favorites(book)
+#     return redirect(url_for('detail', id=book_id))
 
 from flask_wtf import FlaskForm
 from wtforms import StringField, HiddenField
