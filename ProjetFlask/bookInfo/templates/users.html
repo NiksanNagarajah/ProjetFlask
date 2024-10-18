@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>Les auteurs</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+{% endblock %}
+
+{% block styles %}
+{{ super() }}
+{% endblock %}
+
+{% block main %}
+<section class="container-title">
+    <h1>Les utilisateurs</h1>
+</section>
+
+<div class="table-container users">
+    <div class="table-section">
+        <h2>Utilisateurs</h2>
+        <table>
+            <tr>
+                <th><a href="{{ url_for('users', sort='username') }}">Nom<i class="fas fa-sort"></i></a></th>
+                <th><a href="{{ url_for('users', sort='role') }}">Rôle<i class="fas fa-sort"></i></a></th>
+                <th colspan="2">Actions</th>
+            </tr>
+            {% for x in users %}
+            <tr>
+                <td>{{ x.username }}</td>
+                <td>{{ x.role }}</td>
+                <td>
+                    <a class="action" href="{{ url_for('change_role', username=x.username) }}">Changer rôle</a>
+                </td>
+                <td>
+                    <a class="action" href="{{ url_for('delete_user', username=x.username) }}">Supprimer</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+
+<script>
+    function confirmDelete(url) {
+        if (confirm("Êtes-vous sûr de vouloir supprimer cet auteur ?")) {
+            window.location.href = url;  // Redirige vers l'URL de suppression
+        }
+    }
+</script>
+{% endblock %}
