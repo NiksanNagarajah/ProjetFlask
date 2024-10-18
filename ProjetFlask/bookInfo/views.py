@@ -6,7 +6,6 @@ from .models import *
 def home():
     return render_template(
         'home.html', 
-        title="Accueil",
         books=get_sample())
 
 @app.route("/detail/<id>")

@@ -1,5 +1,7 @@
 {% extends "base.html" %}
-
+{% block head %}
+<title>Résultats pour "{{ query }}"</title>
+{% endblock %}
 {% block main %}
 <div class="favorites-container">
     <h1>Résultats de la recherche pour "{{ query }}"</h1>
