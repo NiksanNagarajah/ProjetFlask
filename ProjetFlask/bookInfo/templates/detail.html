@@ -23,9 +23,11 @@
                         <button class="buy-button">Acheter maintenant</button>
                     </a>
                     {% if current_user.is_authenticated %}
-                        <a href="{{ url_for('edit_author', id=book.author_id) }}">
-                            <button class="edit-button">Modifier l'auteur</button>
-                        </a>
+                        {% if current_user.is_admin() %}
+                            <a href="{{ url_for('edit_author', id=book.author_id) }}">
+                                <button class="edit-button">Modifier l'auteur</button>
+                            </a>
+                        {% endif %}
                         {% if book in current_user.favorite_books %}
                             <a href="{{ url_for('remove_favorite', username=current_user.username, book_id=book.id) }}">
                                 <button class="favorite-button active">

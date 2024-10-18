@@ -70,6 +70,7 @@ user_favorites = db.Table('user_favorites',
 class User(db.Model, UserMixin):
     username = db.Column(db.String(80), primary_key=True)
     password = db.Column(db.String(80))
+    role = db.Column(db.String(20), default='user')
 
     favorite_books = db.relationship('Book', secondary=user_favorites, lazy='dynamic', backref=db.backref('favorited_by', lazy='dynamic'))
 
@@ -85,6 +86,10 @@ class User(db.Model, UserMixin):
 
     def get_id(self):
         return self.username
+    
+    def is_admin(self):
+        print(self.role, "***********************")
+        return self.role == 'admin'
     
     def add_to_favorites(self, book):
         if not self.is_favorite(book):

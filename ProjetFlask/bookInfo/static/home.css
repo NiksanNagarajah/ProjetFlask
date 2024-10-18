@@ -550,4 +550,9 @@ h1 {
     margin-top: 10px;
 }
 
+.button-container a {
+    /* margin: 50px auto; */
+    margin-left: 2px;
+    margin-right: 2px;
+}
 
