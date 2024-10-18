@@ -41,11 +41,11 @@
                             {% endif %}
                         </ul>
                         <form class="d-flex" role="search" method="GET" action="{{ url_for('search') }}">
-                            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="query" id="search-input" autocomplete="off" list="search-suggestions" onkeyup="searchSuggestions()">
+                            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="query" id="search-input" autocomplete="off" list="search-suggestions" onkeyup="searchSuggestions()"  style="width: 150px;">
                             <datalist id="search-suggestions"></datalist>
                         
                             <!-- Menu déroulant pour le filtre -->
-                            <select class="form-select me-2" name="filter" id="search-filter">
+                            <select class="form-select me-2" name="filter" id="search-filter" style="width: 100px;">
                                 <option value="all">Tous</option> <!-- Rechercher à la fois Livres et Auteurs -->
                                 <option value="books">Livres</option>
                                 <option value="authors">Auteurs</option>

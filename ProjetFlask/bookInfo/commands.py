@@ -68,3 +68,12 @@ def passwd(username, password):
     u.password = m.hexdigest()
     db.session.commit()
 
+# changer le role d'un utilisateur
+@app.cli.command()
+@click.argument('username')
+def admin(username):
+    """Change the role of an existing user."""
+    from .models import User
+    u = User.query.get(username)
+    u.role = 'admin'
+    db.session.commit()
