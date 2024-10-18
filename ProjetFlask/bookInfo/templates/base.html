@@ -26,7 +26,7 @@
                     <div class="collapse navbar-collapse" id="navbarCollapse">
                         <ul class="navbar-nav me-auto mb-2 mb-md-0">
                             <li class="nav-item">
-                                <a class="nav-link active" aria-current="page" href="{{ url_for('home') }}">Accueil</a>
+                                <a class="nav-link active cache" aria-current="page" href="{{ url_for('home') }}">Accueil</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ url_for('books') }}">Livres</a>
@@ -38,6 +38,11 @@
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ url_for('favorites', username=current_user.username) }}">Favoris</a>
                                 </li>
+                                {% if current_user.is_admin() %}
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{{ url_for('users') }}">Utilisateurs</a>
+                                    </li>
+                                {% endif %}
                             {% endif %}
                         </ul>
                         <form class="d-flex" role="search" method="GET" action="{{ url_for('search') }}">

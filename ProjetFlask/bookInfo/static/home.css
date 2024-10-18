@@ -2,11 +2,20 @@ h1 {
     color: red;
 }
 
+.content {
+    margin: 0 auto;
+    max-width: 800px;
+    padding: 20px;
+}
+
 .sample {
     display: flex;
     justify-content: space-between;
     flex-flow: row wrap;
     padding: 1%;
+    max-width: 800px;
+    text-align: center;
+    margin: auto;
 }
 
 a {
@@ -170,9 +179,14 @@ main > .container {
 .table-container {
     display: flex;
     justify-content: space-between;
-    margin: 20px;
+    margin: 20px auto;
     margin-top: 20px;
     margin-bottom: 8em;
+    width: 920px;
+}
+
+.users {
+    width: 600px;
 }
 
 .table-section {
@@ -481,11 +495,21 @@ h1 {
     }
 }
 
-/* @media (max-width: 1000px) {
+@media (max-width: 1028px) {
     .disapear {
         display: none;
     }
-} */
+    
+}
+
+@media (max-width: 1000px) {
+    .disapear {
+        display: none;
+    }
+    .cache {
+        display: none;
+    }
+}
 
 .book-link {
     text-decoration: none;

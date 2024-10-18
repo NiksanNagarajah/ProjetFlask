@@ -3,6 +3,7 @@ from flask import render_template, jsonify
 from .models import *
 from flask import request, redirect, url_for, render_template
 from flask_login import current_user, login_required
+from wtforms import PasswordField, SubmitField
 
 
 @app.route('/')
@@ -19,7 +20,7 @@ def detail(id):
     return render_template(
         'detail.html',
         book=book,
-        avis=avis  # Passe les avis au template
+        avis=avis  
     )
 
 
@@ -40,14 +41,6 @@ def add_avis(book_id):
     
     return redirect(url_for('detail', id=book_id))
 
-
-# @app.route("/add_favorite/<string:username>/<int:book_id>")
-# def add_favorite(username, book_id):
-#     user = User.query.get(username)
-#     book = Book.query.get(book_id)
-#     user.add_to_favorites(book)
-#     return redirect(url_for('detail', id=book_id))
-
 from flask_wtf import FlaskForm
 from wtforms import StringField, HiddenField
 from wtforms.validators import DataRequired
@@ -61,8 +54,21 @@ class BookForm(FlaskForm):
     id = HiddenField('id')
     title = StringField('Titre', validators=[DataRequired()])
     price = StringField('Prix', validators=[DataRequired()])
+    author = StringField('Auteur', validators=[DataRequired()])
+    submit = SubmitField('Enregistrer')
 
-
+    def prix_valide(self, price):
+        try:
+            float(price)
+            return True
+        except:
+            return False
+    
+    def auteur_valide(self, author):
+        le_auteur = Author.query.filter_by(name=author).first()
+        if le_auteur is None:
+            return False
+        return True
 
 from flask_login import login_required
 
@@ -76,14 +82,24 @@ def edit_author(id):
     author=a, form=f)
 
 
-@app.route("/edit/book/<int:id>")
+@app.route("/edit/book/<int:id>", methods=['GET', 'POST'])
 @login_required
 def edit_book(id):
+    error = None
     b = get_book(id)
-    f = BookForm(id = b.id, title = b.title, price = b.price)
-    return render_template(
-    "edit-book.html",
-    book=b, form=f)
+    f = BookForm(id=b.id, title=b.title, price=b.price, author=b.author.name)
+    if f.validate_on_submit():
+        if not f.prix_valide(f.price.data):
+            flash("Le prix doit être un nombre valide.")
+            return render_template('edit-book.html', book=b, form=f, error="Le prix doit être un nombre valide.")
+        b.title = f.title.data
+        b.price = float(f.price.data) 
+        db.session.commit()
+
+        flash("Livre mis à jour avec succès.")
+        return redirect(url_for('edit_book', id=b.id))
+    return render_template("edit-book.html", book=b, form=f, error=error)
+
     
 
 from flask import url_for, redirect, render_template
@@ -99,27 +115,10 @@ def save_author():
         a.name = f.name.data
         db.session.commit()
         return redirect(url_for('edit_author', id=a.id))
-    # Si la validation échoue, on récupère à nouveau l'auteur
     a = get_author(int(f.id.data))
     return render_template(
-        "edit-author.html",  # Correction du nom du template
+        "edit-author.html", 
         author=a,
-        form=f
-    )
-
-@app.route("/save/book/<int:idBook>", methods=("POST",))
-def save_book(idBook):
-    f = BookForm()
-    if f.validate_on_submit():
-        id = int(f.id.data)
-        b = get_book(id)
-        b.title = f.title.data
-        db.session.commit()
-        return redirect(url_for('edit_book', id = b.id))
-    b = get_book(int(f.id.data))
-    return render_template(
-        "edit-book.html",
-        book=b,
         form=f
     )
 
@@ -137,7 +136,7 @@ def save_new_author():
 
 @app.route("/authors")
 def authors():
-    sort = request.args.get("sort", "id")  # Récupérer le paramètre de tri depuis l'URL
+    sort = request.args.get("sort", "id") 
     if sort == "id":
         les_auteurs_avec_nb_livres = db.session.query(Author, db.func.count(Book.id)).outerjoin(Book).group_by(Author.id).order_by(Author.id).all()
     elif sort == "name":
@@ -153,21 +152,13 @@ def authors():
         sort=sort
     )
 
-
-@app.route("/save/newBook", methods=('POST',))
-def save_new_book():
-    f = BookForm()
-    if f.validate_on_submit():
-        b = Book(title=f.title.data, price=f.price.data)
-        db.session.add(b)
-        db.session.commit()
-        return redirect(url_for('books'))
-    return render_template(
-    "new-book.html",
-    form=f)
+@app.route("/indisponible")
+def indisponible():
+    return render_template("indisponible.html")
 
 @app.route("/books")
 def books():
+    print("books")
     sort = request.args.get("sort", "id")
     if sort == "id":
         books = Book.query.order_by(Book.id).all()
@@ -177,6 +168,7 @@ def books():
         books = Book.query.order_by(Book.price).all()
     else:
         books = Book.query.order_by(Book.id).all()
+    print(books)
     return render_template(
         "books.html",
         books=books
@@ -201,32 +193,28 @@ def newAuthor():
         form=form
         )
 
-@app.route("/book/newBook")
+@app.route("/book/newBook", methods=['GET', 'POST'])
 @login_required
 def newBook():
-    id = Book.query.count() +1
-    form = BookForm(id=id)
-    if form.validate_on_submit():
-        if form.title.data =="":
-            flash("Le titre est obligatoire")
-            return redirect(url_for('newBook'))
-        elif form.price.data =="":
-            flash("Le prix est obligatoire")
-            return redirect(url_for('newBook'))
-        elif form.url.data =="":
-            flash("L'url est obligatoire")
-            return redirect(url_for('newBook'))
-        elif form.img.data =="":
-            flash("L'image est obligatoire")
-            return redirect(url_for('newBook'))
-        new_book = Book(id=id, title=form.title.data, price=form.price.data, url=form.url.data, img=form.img.data)
+    id = Book.query.count() + 1
+    f = BookForm()
+    print("cadeau")
+    if f.validate_on_submit():
+        if f.prix_valide(f.price.data) == False:
+            flash("Le prix doit être un nombre.")
+            return render_template('new-book.html', form=f, error="Le prix doit être un nombre.")
+        if f.auteur_valide(f.author.data) == False:
+            flash("L'auteur n'existe pas.")
+            return render_template('new-book.html', form=f, error="L'auteur n'existe pas.")
+        id_auteur = Author.query.filter_by(name=f.author.data).first()
+        new_book = Book(id=id, title=f.title.data, price=f.price.data, url=url_for('indisponible') , img='default_book.jpg', author_id=id_auteur.id)
         db.session.add(new_book)
         db.session.commit()
         flash("Livre ajouté avec succès !")
-        return redirect(url_for('books'))
+        return redirect(url_for('detail', id=id))
     return render_template(
         "new-book.html",
-        form=form
+        form=f, error=None
     )
 
 
@@ -239,7 +227,7 @@ def add_author():
         db.session.add(new_author)
         db.session.commit()
         flash('Auteur enregistré avec succès !')
-        return redirect(url_for('authors'))  # Rediriger vers la liste des auteurs
+        return redirect(url_for('authors')) 
 
     return render_template('add_author.html', form=form)
 
@@ -247,13 +235,22 @@ def add_author():
 def add_book():
     form = BookForm()
     if form.validate_on_submit():
-        new_book = Book(title=form.title.data, price=form.price.data, url=form.url.data, img=form.img.data)
+        if not form.prix_valide(form.price.data):
+            flash("Le prix doit être un nombre valide.")
+            return redirect(url_for('newBook'))        
+        new_book = Book(
+            title=form.title.data,
+            price=form.price.data,
+            author=form.author.data,
+            url=url_for('indisponible'), 
+            img="default_book.jpg" 
+        )
         db.session.add(new_book)
         db.session.commit()
-        flash('Livre enregistré avec succès !')
-        return redirect(url_for('books'))  # Rediriger vers la liste des auteurs
+        flash("Livre ajouté avec succès !")
+        return redirect(url_for('books'))
 
-    return render_template('add_book.html', form=form)
+    return render_template(url_for('newBook'), form=form)
 
 from wtforms import PasswordField, SubmitField
 from .models import User
@@ -272,8 +269,6 @@ class LoginForm(FlaskForm):
         m.update(self.password.data.encode())
         passwd = m.hexdigest()
         return user if passwd == user.password else None
-    
-
 
 
 from flask import request, redirect, render_template, url_for
@@ -291,7 +286,6 @@ def login():
             next_page = f.next.data or url_for("home")
             return redirect(next_page)
     return render_template("login.html", form=f)
-
 
 
 from flask_login import logout_user
@@ -373,21 +367,6 @@ def remove_favorite(username, book_id):
 
 @app.route("/suggestions", methods=["GET"])
 def suggestions():
-    # query = request.args.get('query', '').lower()
-    # results = []
-    
-    # if query:
-    #     books = Book.query.filter(Book.title.ilike(f"%{query}%")).all()
-    #     results = []
-    #     for book in books:
-    #         results.append({
-    #             'id': book.id,
-    #             'title': book.title,
-    #             'price': book.price,
-    #             'img': url_for('static', filename='images/'+book.img),  
-    #             'url_detail': url_for('detail', id=book.id)
-    #         })
-    # return jsonify({'suggestions': results})
     query = request.args.get('query', '').lower()
     books = Book.query.filter(Book.title.ilike(f"%{query}%")).all()
     les_livres = []
@@ -407,14 +386,13 @@ def suggestions():
             'name': author.name,
             'url_author': url_for('search_author', query=author.name)
         })
-    print("'''''''''''''''''''''''''''''''")
     return jsonify({'books': les_livres, 'authors': les_auteurs})
 
 
 @app.route("/search", methods=["GET"])
 def search():
     query = request.args.get('query', '')
-    filter_type = request.args.get('filter', 'all')  # Filtre (Livres, Auteurs, Tous)
+    filter_type = request.args.get('filter', 'all')  
     if not query:
         results = []
     else:
@@ -425,8 +403,7 @@ def search():
         else:
             books = Book.query.filter(Book.title.ilike(f"%{query}%")).all()
             authors = Author.query.filter(Author.name.ilike(f"%{query}%")).all()
-            results = books + authors  # Combine livres et auteurs
-    print("----------------------")
+            results = books + authors  
     return render_template(
         'search_results.html',
         query=query,
@@ -434,10 +411,10 @@ def search():
         filter_type=filter_type
     )
 
-@app.route("/search_author", methods=["GET"])  # Renommez cette route pour qu'elle soit unique
+@app.route("/search_author", methods=["GET"]) 
 def search_author():
     query = request.args.get('query', '')
-    authors = Author.query.filter(Author.name.ilike(f"%{query}%")).all()  # Récupérez les auteurs basés sur le nom
+    authors = Author.query.filter(Author.name.ilike(f"%{query}%")).all() 
     return render_template(
         'search_results.html', 
         query=query, 
@@ -445,3 +422,30 @@ def search_author():
         filter_type='authors'
     )
 
+@app.route("/users")
+def users():
+    sort = request.args.get("sort", "username")
+    if sort == "username":
+        users = User.query.filter(User.username != "admin").order_by(User.username).all()
+    elif sort == "role":
+        users = User.query.filter(User.username != "admin").order_by(User.role).all()
+    else:
+        users = User.query.filter(User.username != "admin").all()
+    return render_template(
+        "users.html",
+        users=users
+    )
+
+@app.route("/delete/user/<string:username>")
+def delete_user(username):
+    user = User.query.get(username)
+    db.session.delete(user)
+    db.session.commit()
+    return redirect(url_for('users'))
+
+@app.route("/change-admin/<string:username>")
+def change_role(username):
+    user = User.query.get(username)
+    user.role = "admin" if user.role == "user" else "user"
+    db.session.commit()
+    return redirect(url_for('users'))
