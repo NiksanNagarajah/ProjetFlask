@@ -1,4 +1,7 @@
 {% extends "base.html" %}
+{% block head %}
+<title>Ajouter un auteur</title>
+{% endblock %}
 {% block main %}
 <h1>Add author</h1>
 <form class="form-horizontal" role="form" method="POST" action="{{ url_for ('save_new_author') }}">
