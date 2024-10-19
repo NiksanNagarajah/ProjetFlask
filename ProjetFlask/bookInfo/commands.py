@@ -47,10 +47,10 @@ def syncdb():
 def newuser(username, password):
     """Create a new user."""
     from .models import User
-    from hashlib import sha256
-    m = sha256()
-    m.update(password.encode())
-    u = User(username=username, password=m.hexdigest())
+    # from hashlib import sha256
+    # m = sha256()
+    # m.update(password.encode())
+    u = User(username=username, password=password)
     db.session.add(u)
     db.session.commit()
 

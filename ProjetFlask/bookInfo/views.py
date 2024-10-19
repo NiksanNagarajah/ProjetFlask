@@ -254,6 +254,7 @@ class LoginForm(FlaskForm):
     username = StringField('Username')
     password = PasswordField('Password')
     next = HiddenField()
+    submit = SubmitField('Se connecter')
 
     def get_authenticated_user(self):
         user = User.query.get(self.username.data)
@@ -279,6 +280,9 @@ def login():
             login_user(user)
             next_page = f.next.data or url_for("home")
             return redirect(next_page)
+        else:
+            flash("Nom d'utilisateur ou mot de passe incorrect.")
+            return render_template("login.html", form=f, error="Nom d'utilisateur ou mot de passe incorrect.")
     return render_template("login.html", form=f)
 
 
