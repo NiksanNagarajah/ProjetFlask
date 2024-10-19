@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block head %}
+<title>Résultats pour "{{ query }}"</title>
+{% endblock %}
+{% block main %}
+<div class="favorites-container">
+    <h1>Résultats de la recherche pour "{{ query }}"</h1>
+    
+    {% if results %}
+        <div class="favorites-list">
+            {% for result in results %}
+                {% if result.__tablename__ == 'book' %}
+                <!-- Affichage pour les Livres -->
+                <a href="{{ url_for('detail', id=result.id) }}" class="book-link">
+                    <div class="book-card">
+                        <div class="book-image">
+                            <img src="{{ url_for('static', filename='images/'+result.img)}}" alt="{{ result.title }}" title="{{ result.title }}">
+                        </div>
+                        <div class="detail-book">
+                            <h2 class="book-title">{{ result.title }}</h2>
+                            <p class="book-author">Auteur: <span>{{ result.author.name }}</span></p>
+                            <p class="book-price">Prix: <span>{{ result.price }} €</span></p>
+                        </div>
+                    </div>
+                </a>
+                {% elif result.__tablename__ == 'author' %}
+                <!-- Affichage pour les Auteurs -->
+                <div class="author-card">
+                    <h2 class="author-name">{{ result.name }}</h2>
+                    <p class="author-books-count">Nombre de livres: {{ result.books.all()|length }}</p>
+                    <ul class="author-books-list">
+                        {% for book in result.books %}
+                        <li>
+                            <a href="{{ url_for('detail', id=book.id) }}">{{ book.title }}</a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>Aucun résultat trouvé.</p>
+    {% endif %}
+</div>
+{% endblock %}

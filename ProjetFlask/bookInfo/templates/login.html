@@ -1,5 +1,7 @@
 {% extends "base.html" %}
-
+{% block head %}
+<title>Se connecter</title>
+{% endblock %}
 {% block main %}
 <h1>Se connecter</h1>
 <form class="form-horizontal" role="form" method="POST" action="{{ url_for('login') }}">
@@ -17,12 +19,14 @@
             {{ form.password(size=50, class_="form-control", placeholder="Password") }}
         </div>
     </div>
-
     <div class="form-group">
+        {% if error %}
+            <p><strong>Erreur : </strong>{{ error }}</p>
+        {% endif %}
         <div class="les-btn">
-            <button type="submit" class="btn-connecter">Se connecter</button>
+            {{ form.submit(class_="btn-inscrire") }}
             <a href="{{ url_for('sign_in') }}" class="btn-inscrire">S'inscrire</a>
         </div>
-    </div>    
+    </div>     
 </form>
 {% endblock %}

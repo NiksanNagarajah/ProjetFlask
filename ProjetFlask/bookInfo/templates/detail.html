@@ -3,7 +3,6 @@
     <head>
         <title>Info : {{ book.title }}</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
-        <!-- Lien vers Font Awesome pour les icônes de coeur -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     </head>
     <body>
@@ -17,14 +16,18 @@
                 <h1 class="book-title">{{ book.title }}</h1>
                 <p class="book-author">Auteur: <span>{{ book.author.name }}</span></p>
                 <p class="book-price">Prix: <span>{{ book.price }} €</span></p>
+
+                <!-- Section des boutons -->
                 <div class="button-container">
                     <a href="{{ book.url }}" target="_blank">
                         <button class="buy-button">Acheter maintenant</button>
                     </a>
                     {% if current_user.is_authenticated %}
-                        <a href="{{ url_for('edit_author', id=book.author_id) }}">
-                            <button class="edit-button">Modifier l'auteur</button>
-                        </a>
+                        {% if current_user.is_admin() %}
+                            <a href="{{ url_for('edit_author', id=book.author_id) }}">
+                                <button class="edit-button">Modifier l'auteur</button>
+                            </a>
+                        {% endif %}
                         {% if book in current_user.favorite_books %}
                             <a href="{{ url_for('remove_favorite', username=current_user.username, book_id=book.id) }}">
                                 <button class="favorite-button active">
@@ -41,6 +44,30 @@
                     {% endif %}
                 </div>
             </div>
+        </div>
+        <!-- Section des avis -->
+        <div class="book-reviews">
+            <h2>Avis</h2>
+            {% if avis %}
+            <ul>
+                {% for review in avis %}
+                <li><strong>{{ review.user_id }} :</strong> {{ review.avis }}</li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>Aucun avis pour ce livre pour le moment.</p>
+            {% endif %}
+
+            <!-- Formulaire pour ajouter un avis (uniquement pour les utilisateurs connectés) -->
+            {% if current_user.is_authenticated %}
+            <h3>Ajouter ou modifier votre avis</h3>
+            <form action="{{ url_for('add_avis', book_id=book.id) }}" method="POST">
+                <textarea name="avis" placeholder="Écrivez votre avis ici..." required></textarea>
+                <button type="submit">Envoyer</button>
+            </form>
+            {% else %}
+            <p>Connectez-vous pour ajouter un avis.</p>
+            {% endif %}
         </div>
         {% endblock %}
     </body>

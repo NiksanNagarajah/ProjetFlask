@@ -1,12 +1,19 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>{{ title }}</title>
+        <title>Accueil</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
     </head>
     <body>
         {% extends "base.html" %}
         {% block main %}
+        <section class="container-title">
+            <h1>Accueil</h1>
+        </section>
+        <section class="content">
+            <p>Bienvenue sur notre site de vente de livres en ligne. Vous pouvez consulter notre collection de livres, voir les détails de chaque livre et les acheter. Vous pouvez également consulter les auteurs et les détails de chaque auteur.</p>
+            <h2>Livres recommandés</h2>
+        </section>
         <div class="sample">
             {% for x in books %}
             <a href="{{ url_for('detail', id=x.id) }}"><img src="{{ url_for('static', filename='images/' + x.img)}}" alt="{{x.title}}" title="{{x.title}}"></a>

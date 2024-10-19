@@ -2,15 +2,28 @@ h1 {
     color: red;
 }
 
+.content {
+    margin: 0 auto;
+    max-width: 800px;
+    padding: 20px;
+}
+
 .sample {
     display: flex;
     justify-content: space-between;
     flex-flow: row wrap;
     padding: 1%;
+    max-width: 800px;
+    text-align: center;
+    margin: auto;
 }
 
 a {
     text-decoration: none;
+}
+
+img {
+    border-radius: 8px;
 }
 
 .sample>a {
@@ -19,6 +32,11 @@ a {
 
 .sample img {
     height: 150px;
+    transition: transform 0.3s ease;
+}
+
+.sample img:hover {
+    transform: scale(1.1);
 }
 
 footer {
@@ -46,7 +64,7 @@ main > .container {
     overflow: hidden;
     width: 600px;
     margin: auto;
-    margin-top: 10%;
+    margin-top: 50px;
 }
 
 .book-image img {
@@ -161,9 +179,14 @@ main > .container {
 .table-container {
     display: flex;
     justify-content: space-between;
-    margin: 20px;
+    margin: 20px auto;
     margin-top: 20px;
     margin-bottom: 8em;
+    width: 920px;
+}
+
+.users {
+    width: 600px;
 }
 
 .table-section {
@@ -189,6 +212,30 @@ th, td {
 
 th {
     background-color: #f2f2f2;
+}
+
+th a {
+    text-decoration: none;
+    color: inherit;
+}
+
+th a:hover {
+    text-decoration: underline;
+}
+
+th i {
+    margin-left: 5px;
+}
+
+table img {
+    width: 50px;
+    height: auto;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+table img:hover {
+    transform: scale(2);
 }
 
 .action {
@@ -351,4 +398,218 @@ h1 {
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
+
+#search-input {
+    position: relative;
+    z-index: 10; /* S'assure que l'input est bien au-dessus des autres éléments */
+}
+
+#search-suggestions {
+    display: block;
+    position: absolute;
+    top: 100%;  /* Positionne le datalist juste en dessous du champ */
+    left: 0;
+    z-index: 999;
+    width: 100%;
+    max-width: 400px;  /* Largeur maximale si vous voulez qu'il ne dépasse pas une certaine taille */
+    box-sizing: border-box;
+    background-color: white;
+    border: 1px solid #ccc;
+    max-height: 200px;  /* Limite la hauteur des suggestions */
+    overflow-y: auto;
+}
+
+.suggestion-item {
+    padding: 10px;
+    cursor: pointer;
+    width: 100%;  /* Assure que le datalist prend la même largeur que l'input */
+    max-width: 400px;
+}
+
+.suggestion-item:hover {
+    background-color: #f0f0f0;
+}
+
+
+/* Container for the author card */
+.author-card {
+    padding: 20px;
+    background-color: #fdfdfd;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Hover effect for the author card */
+.author-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Author's name style */
+.author-name {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+/* Number of books text */
+.author-books-count {
+    font-size: 18px;
+    color: #555;
+    margin-bottom: 15px;
+}
+
+/* List of books by the author */
+.author-books-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Individual book links under the author */
+.author-books-list a {
+    font-size: 16px;
+    color: #3498db;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+/* Hover effect for book links */
+.author-books-list a:hover {
+    color: #2980b9;
+    text-decoration: underline;
+}
+
+/* Responsive design for the favorites list */
+@media (min-width: 768px) {
+    .favorites-list {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+}
+
+@media (max-width: 1028px) {
+    .disapear {
+        display: none;
+    }
+    
+}
+
+@media (max-width: 1000px) {
+    .disapear {
+        display: none;
+    }
+    .cache {
+        display: none;
+    }
+}
+
+.book-link {
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.book-link:hover .book-card {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Section des avis */
+.book-reviews {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin: 20px auto;
+    max-width: 600px;
+    margin-bottom: 75px;
+    margin-top: 30px;
+}
+
+.book-reviews h2 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.book-reviews ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.book-reviews ul li {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+.book-reviews ul li strong {
+    color: #3498db;
+}
+
+.book-reviews p {
+    font-size: 16px;
+    color: #555;
+    text-align: center;
+    padding: 10px;
+    background-color: #f4f4f4;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.book-reviews form {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.book-reviews textarea {
+    resize: none;
+    height: 100px;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.book-reviews button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.book-reviews button:hover {
+    background-color: #2980b9;
+}
+
+.book-reviews p.connect-message {
+    font-size: 16px;
+    color: #e74c3c;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.button-container a {
+    /* margin: 50px auto; */
+    margin-left: 2px;
+    margin-right: 2px;
+}
 

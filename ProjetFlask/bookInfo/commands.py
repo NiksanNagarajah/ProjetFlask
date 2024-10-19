@@ -47,10 +47,10 @@ def syncdb():
 def newuser(username, password):
     """Create a new user."""
     from .models import User
-    from hashlib import sha256
-    m = sha256()
-    m.update(password.encode())
-    u = User(username=username, password=m.hexdigest())
+    # from hashlib import sha256
+    # m = sha256()
+    # m.update(password.encode())
+    u = User(username=username, password=password)
     db.session.add(u)
     db.session.commit()
 
@@ -68,3 +68,12 @@ def passwd(username, password):
     u.password = m.hexdigest()
     db.session.commit()
 
+# changer le role d'un utilisateur
+@app.cli.command()
+@click.argument('username')
+def admin(username):
+    """Change the role of an existing user."""
+    from .models import User
+    u = User.query.get(username)
+    u.role = 'admin'
+    db.session.commit()
