@@ -88,7 +88,6 @@ class User(db.Model, UserMixin):
         return self.username
     
     def is_admin(self):
-        print(self.role, "***********************")
         return self.role == 'admin'
     
     def add_to_favorites(self, book):

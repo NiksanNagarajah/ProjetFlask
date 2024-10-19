@@ -4,7 +4,10 @@ from .models import *
 from flask import request, redirect, url_for, render_template
 from flask_login import current_user, login_required
 from wtforms import PasswordField, SubmitField
-
+from sqlalchemy import func
+from flask_wtf.file import FileField, FileAllowed 
+from werkzeug.utils import secure_filename
+import os
 
 @app.route('/')
 def home():
@@ -49,12 +52,14 @@ from flask import render_template, flash
 class AuthorForm(FlaskForm):
     id = HiddenField('id')
     name = StringField('Nom', validators=[DataRequired()])
+    submit = SubmitField('Enregistrer')
 
 class BookForm(FlaskForm):
     id = HiddenField('id')
     title = StringField('Titre', validators=[DataRequired()])
     price = StringField('Prix', validators=[DataRequired()])
     author = StringField('Auteur', validators=[DataRequired()])
+    img = FileField('Image')
     submit = SubmitField('Enregistrer')
 
     def prix_valide(self, price):
@@ -158,7 +163,6 @@ def indisponible():
 
 @app.route("/books")
 def books():
-    print("books")
     sort = request.args.get("sort", "id")
     if sort == "id":
         books = Book.query.order_by(Book.id).all()
@@ -168,7 +172,6 @@ def books():
         books = Book.query.order_by(Book.price).all()
     else:
         books = Book.query.order_by(Book.id).all()
-    print(books)
     return render_template(
         "books.html",
         books=books
@@ -193,12 +196,13 @@ def newAuthor():
         form=form
         )
 
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+
 @app.route("/book/newBook", methods=['GET', 'POST'])
 @login_required
 def newBook():
-    id = Book.query.count() + 1
+    id = db.session.query(func.max(Book.id)).scalar() + 1
     f = BookForm()
-    print("cadeau")
     if f.validate_on_submit():
         if f.prix_valide(f.price.data) == False:
             flash("Le prix doit être un nombre.")
@@ -206,8 +210,19 @@ def newBook():
         if f.auteur_valide(f.author.data) == False:
             flash("L'auteur n'existe pas.")
             return render_template('new-book.html', form=f, error="L'auteur n'existe pas.")
+        if f.img.data:
+            filename = secure_filename(f.img.data.filename)
+            if '.' in filename and not filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS:
+                flash("Le fichier n'est pas une image.")
+                return render_template('new-book.html', form=f, error="Le fichier n'est pas une image. (formats autorisés: png, jpg, jpeg)")
+        else:
+            filename = 'default_book.jpg'
+        if f.img.data:
+            filename = secure_filename(f.img.data.filename)
+            img_path = os.path.join(os.getcwd(), 'bookInfo/static/images', filename)
+            f.img.data.save(img_path)                    
         id_auteur = Author.query.filter_by(name=f.author.data).first()
-        new_book = Book(id=id, title=f.title.data, price=f.price.data, url=url_for('indisponible') , img='default_book.jpg', author_id=id_auteur.id)
+        new_book = Book(id=id, title=f.title.data, price=f.price.data, url=url_for('indisponible') , img=filename, author_id=id_auteur.id)
         db.session.add(new_book)
         db.session.commit()
         flash("Livre ajouté avec succès !")
@@ -230,27 +245,6 @@ def add_author():
         return redirect(url_for('authors')) 
 
     return render_template('add_author.html', form=form)
-
-@app.route("/add_book", methods=['GET', 'POST'])
-def add_book():
-    form = BookForm()
-    if form.validate_on_submit():
-        if not form.prix_valide(form.price.data):
-            flash("Le prix doit être un nombre valide.")
-            return redirect(url_for('newBook'))        
-        new_book = Book(
-            title=form.title.data,
-            price=form.price.data,
-            author=form.author.data,
-            url=url_for('indisponible'), 
-            img="default_book.jpg" 
-        )
-        db.session.add(new_book)
-        db.session.commit()
-        flash("Livre ajouté avec succès !")
-        return redirect(url_for('books'))
-
-    return render_template(url_for('newBook'), form=form)
 
 from wtforms import PasswordField, SubmitField
 from .models import User
@@ -328,7 +322,6 @@ def sign_in():
 
 @app.route("/delete/author/<int:id>")
 def delete_author(id):
-    print("delete author")
     a = get_author(id)
     db.session.delete(a)
     db.session.commit()

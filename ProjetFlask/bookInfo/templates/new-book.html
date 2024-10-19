@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block main %}
 <h1>Ajouter un Livre</h1>
-<form class="form-horizontal" role="form" method="POST" action="{{ url_for ('newBook') }}">
+<form class="form-horizontal" role="form" method="POST" action="{{ url_for ('newBook') }}" enctype="multipart/form-data">
     {{ form.hidden_tag() }}
     <div class="form-group">
         <label for="title" class="col-sm-2 control-label">{{ form.title.label }}</label>
@@ -19,6 +19,12 @@
         <label for="author" class="col-sm-2 control-label">{{ form.author.label }}</label>
         <div>
             {{ form.author(size=50, class_="form-control", placeholder="Nom de l'auteur") }}
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="img" class="col-sm-2 control-label">{{ form.img.label }}</label>
+        <div>
+            {{ form.img(size=50, class_="form-control") }}
         </div>
     </div>
     <div class="form-group">
